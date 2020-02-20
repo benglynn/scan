@@ -1,0 +1,25 @@
+{
+  "name": "size-images",
+  "version": "1.0.0",
+  "description": "Experimenting. Creating images to a concise spec using sharp.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node ./src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/benglynn/size-images.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/benglynn/size-images/issues"
+  },
+  "homepage": "https://github.com/benglynn/size-images#readme",
+  "devDependencies": {
+    "ajv": "^6.11.0",
+    "md5": "^2.2.1",
+    "sharp": "^0.24.1"
+  }
+}
