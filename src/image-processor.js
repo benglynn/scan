@@ -1,36 +1,16 @@
 class ImageProcessor {
 
-    constructor(spec, opts) {
-        const options = {
-            fs: require('fs'),
-            sharp: require('sharp'),
-            md5: require('md5'),
-            ...opts
+    constructor(spec, options) {
+        this.options = options;
+        if (!this.options.validate(spec)) {
+            throw new Error('unexpected spec format');
         }
-        if (options.vaidate === undefined) {
-            const Ajv = require('ajv');
-            const ajv = new Ajv({ allErrors: true });
-            options.validate = ajv.compile(this.specSchema());
-        }
-        this.specItemPattern = '^(\\d)x(\\d)\\-(\\d+)w\\.(jpg|webp)$';
-        this.readFileSync = options.fs.readFileSync;
-        this.md5 = options.md5;
-        this.sharp = options.sharp;
-        this.validate = options.validate;
-        this.spec = this.parseSpec(spec);
+        this.expandedSpec = ImageProcessor.parseSpec(spec);
     }
 
-    specSchema () {
-        return {
-            type: 'array',
-            items: { type: 'string', pattern: this.specItemPattern }
-        };
-    }
-
-    parseSpec (rawSpec) {
-        if (!this.validate(rawSpec)) throw new Error('unexpected spec format');
-        const itemPattern = new RegExp(this.specItemPattern);
-        return rawSpec.map(key => {
+    static parseSpec (spec) {
+        const itemPattern = new RegExp(ImageProcessor.specItemPattern);
+        return spec.map(key => {
             const [name, ratioWidth, ratioHeight, width, type] = key
                 .match(itemPattern);
             const ratio = parseInt(ratioWidth) / parseInt(ratioHeight);
@@ -39,17 +19,36 @@ class ImageProcessor {
         })
     }
 
+    static create (spec, options={}) {
+        const resolved = {
+            readFileSync: options.readFileSync || require('fs').readFileSync,
+            md5: options.md5 || require('md5'),
+            sharp: options.sharp || require('sharp'),
+            validate: options.validate || (() => {
+                const Ajv = require('ajv');
+                const ajv = new Ajv({ allErrors: true });
+                return ajv.compile(ImageProcessor.specSchema);
+            })()
+        }
+        return new ImageProcessor(spec, resolved);
+    }
+
     process (filePth) {
         const inFilePattern = /^.*?([^/\\]+)\.(jpg|png)$/;
         const valid = inFilePattern.test(filePth) === true;
-        if (!valid) throw new Error(`unexpected file path: ${filePth}`);
+        if (!valid) {
+            throw new Error(`unexpected file path: ${filePth}`);
+        }
         const originalName = filePth.match(inFilePattern)[1];
-        const bytes = this.readFileSync(filePth);
-        const hash = this.md5(bytes);
-        return this.spec.map(imgSpec => {
+        const bytes = this.options.readFileSync(filePth);
+        const hash = this.options.md5(bytes);
+        return this.expandedSpec.map(imgSpec => {
             const name = `${originalName}-${hash}-${imgSpec.name}`;
-            return this.sharp(bytes).resize(imgSpec.width, imgSpec.height)
-                .toFormat(imgSpec.type).toBuffer().then(bytes => {
+            return this.options.sharp(bytes)
+                .resize(imgSpec.width, imgSpec.height)
+                .toFormat(imgSpec.type)
+                .toBuffer()
+                .then(bytes => {
                     const size = bytes.byteLength;
                     return { name, source: () => bytes, size: () => size };
                 });
@@ -57,6 +56,14 @@ class ImageProcessor {
     }
 }
 
-const create = (spec, options) => new ImageProcessor(spec, options);
+ImageProcessor.specItemPattern = '^(\\d)x(\\d)\\-(\\d+)w\\.(jpg|webp)$';
 
-module.exports = create;
+ImageProcessor.specSchema = {
+    type: 'array',
+    items: { type: 'string', pattern: ImageProcessor.specItemPattern }
+}
+
+module.exports = {
+    createProcessor: ImageProcessor.create,
+    parseSpec: ImageProcessor.parseSpec
+};

@@ -8,4 +8,8 @@ npm install
 
 # process the test image as per src/article-image-spec.json
 npm start
+
+
+# test
+npm test
 ```

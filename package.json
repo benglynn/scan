@@ -2,9 +2,10 @@
   "name": "size-images",
   "version": "1.0.0",
   "description": "Experimenting. Creating images to a concise spec using sharp.",
-  "main": "index.js",
+  "main": "src/image-processor.js",
   "scripts": {
-    "start": "node ./src/index.js"
+    "test": "mocha",
+    "start": "node index.js"
   },
   "repository": {
     "type": "git",
@@ -19,7 +20,9 @@
   "homepage": "https://github.com/benglynn/size-images#readme",
   "devDependencies": {
     "ajv": "^6.11.0",
+    "chai": "^4.2.0",
     "md5": "^2.2.1",
+    "mocha": "^7.0.1",
     "sharp": "^0.24.1"
   }
 }
