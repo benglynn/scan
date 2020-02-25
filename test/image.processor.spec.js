@@ -17,6 +17,31 @@ describe('ImageProcessor', function() {
       expect(() => createProcessor(['1x1-160w.jpg'])).not.to.throw();
       expect(() => createProcessor(specFixture)).not.to.throw();
     })
+  });
+
+  describe('#process()', function() {
+
+    const createMocked = () => {
+      const readFileSync = (_) => 12345;
+      const md5 = (_) => 'abcdef';
+      const sharp = () => ({
+        resize: () => ({
+          toFormat: () => ({
+            toBuffer: () => Promise.resolve({ byteLength: 999 })
+          })
+        })
+      });
+      const validate = () => true;
+      const options = { readFileSync, md5, sharp, validate }
+      return createProcessor(specFixture, options );
+    }
+
+    it('should throw for an unsuported file type', function() {
+      const instance = createMocked();
+      expect(() => instance.process('not a file')).to.throw();
+      expect(() => instance.process('/path/to/unsuported.svg')).to.throw();
+      expect(() => instance.process('no-path.jpg')).not.to.throw();
+    })
 
   });
 
