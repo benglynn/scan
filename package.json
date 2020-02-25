@@ -1,23 +1,26 @@
 {
-  "name": "size-images",
+  "name": "@benglynn/image-generator",
   "version": "1.0.0",
-  "description": "Experimenting. Creating images to a concise spec using sharp.",
-  "main": "src/image-processor.js",
+  "description": "Generate many versions of an image.",
+  "main": "src/image-generator.js",
   "scripts": {
     "test": "mocha",
-    "demo": "node demo.js"
+    "demo": "node test/demo.js"
+  },
+  "mocha": {
+    "spec": "./test/**/*.spec.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/benglynn/size-images.git"
+    "url": "git+https://github.com/benglynn/image-generator.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/benglynn/size-images/issues"
+    "url": "https://github.com/benglynn/image-generator/issues"
   },
-  "homepage": "https://github.com/benglynn/size-images#readme",
+  "homepage": "https://github.com/benglynn/image-generator#readme",
   "devDependencies": {
     "ajv": "^6.11.0",
     "chai": "^4.2.0",

@@ -1,16 +1,16 @@
-class ImageProcessor {
+class ImageGenerator {
 
     constructor(spec, options) {
         this.options = options;
+        this.parseSpec(spec);
+    }
+
+    parseSpec (spec) {
         if (!this.options.validate(spec)) {
             throw new Error('unexpected spec format');
         }
-        this.expandedSpec = ImageProcessor.parseSpec(spec);
-    }
-
-    static parseSpec (spec) {
-        const itemPattern = new RegExp(ImageProcessor.specItemPattern);
-        return spec.map(key => {
+        const itemPattern = new RegExp(ImageGenerator.specItemPattern);
+        this.spec = spec.map(key => {
             const [name, ratioWidth, ratioHeight, width, type] = key
                 .match(itemPattern);
             const ratio = parseInt(ratioWidth) / parseInt(ratioHeight);
@@ -27,10 +27,10 @@ class ImageProcessor {
             validate: options.validate || (() => {
                 const Ajv = require('ajv');
                 const ajv = new Ajv({ allErrors: true });
-                return ajv.compile(ImageProcessor.specSchema);
+                return ajv.compile(ImageGenerator.specSchema);
             })()
         }
-        return new ImageProcessor(spec, resolved);
+        return new ImageGenerator(spec, resolved);
     }
 
     process (filePth) {
@@ -42,7 +42,7 @@ class ImageProcessor {
         const originalName = filePth.match(inFilePattern)[1];
         const bytes = this.options.readFileSync(filePth);
         const hash = this.options.md5(bytes);
-        return this.expandedSpec.map(imgSpec => {
+        return this.spec.map(imgSpec => {
             const name = `${originalName}-${hash}-${imgSpec.name}`;
             return this.options.sharp(bytes)
                 .resize(imgSpec.width, imgSpec.height)
@@ -56,14 +56,11 @@ class ImageProcessor {
     }
 }
 
-ImageProcessor.specItemPattern = '^(\\d)x(\\d)\\-(\\d+)w\\.(jpg|webp)$';
+ImageGenerator.specItemPattern = '^(\\d)x(\\d)\\-(\\d+)w\\.(jpg|webp)$';
 
-ImageProcessor.specSchema = {
+ImageGenerator.specSchema = {
     type: 'array',
-    items: { type: 'string', pattern: ImageProcessor.specItemPattern }
+    items: { type: 'string', pattern: ImageGenerator.specItemPattern }
 }
 
-module.exports = {
-    createProcessor: ImageProcessor.create,
-    parseSpec: ImageProcessor.parseSpec
-};
+module.exports = ImageGenerator.create;

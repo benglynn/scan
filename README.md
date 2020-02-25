@@ -1,4 +1,4 @@
-# Size Images
+# Image generator
 
 Generate many versions of an image. Useful in static site generation for
 responsive design and SEO.
