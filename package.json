@@ -5,7 +5,7 @@
   "main": "src/image-processor.js",
   "scripts": {
     "test": "mocha",
-    "start": "node index.js"
+    "demo": "node demo.js"
   },
   "repository": {
     "type": "git",
