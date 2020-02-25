@@ -1,3 +1,5 @@
+![Node.js CI](https://github.com/benglynn/image-generator/workflows/Node.js%20CI/badge.svg)
+
 # Image generator
 
 Generate many versions of an image. Useful in static site generation for
