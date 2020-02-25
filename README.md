@@ -17,7 +17,7 @@ The **asset object** is an object (like a webpack asset) on which:
 - `source()` returns the new image bytes.
 - `size()` returns the byte length of the new image.
 
-See [demo.js](./demo.js) for example usage.
+See [demo.js](./test/demo.js) for example usage.
 
 ```bash
 # once

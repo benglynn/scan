@@ -15,8 +15,8 @@ class ImageGenerator {
                 .match(itemPattern);
             const ratio = parseInt(ratioWidth) / parseInt(ratioHeight);
             const height = Math.round(parseInt(width) / ratio);
-            return { name, width: parseInt(width), height, type }
-        })
+            return { name, width: parseInt(width), height, type };
+        });
     }
 
     static create (spec, options={}) {
@@ -29,7 +29,7 @@ class ImageGenerator {
                 const ajv = new Ajv({ allErrors: true });
                 return ajv.compile(ImageGenerator.specSchema);
             })()
-        }
+        };
         return new ImageGenerator(spec, resolved);
     }
 
@@ -61,6 +61,6 @@ ImageGenerator.specItemPattern = '^(\\d)x(\\d)\\-(\\d+)w\\.(jpg|webp)$';
 ImageGenerator.specSchema = {
     type: 'array',
     items: { type: 'string', pattern: ImageGenerator.specItemPattern }
-}
+};
 
 module.exports = ImageGenerator.create;
