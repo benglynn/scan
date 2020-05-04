@@ -9,10 +9,9 @@ class ImageGenerator {
         if (!this.options.validate(spec)) {
             throw new Error('unexpected spec format');
         }
-        const itemPattern = new RegExp(ImageGenerator.specItemPattern);
         this.spec = spec.map(key => {
             const [name, ratioWidth, ratioHeight, width, type] = key
-                .match(itemPattern);
+                .match(ImageGenerator.specItemPattern);
             const ratio = parseInt(ratioWidth) / parseInt(ratioHeight);
             const height = Math.round(parseInt(width) / ratio);
             return { name, width: parseInt(width), height, type };
@@ -24,11 +23,7 @@ class ImageGenerator {
             readFileSync: options.readFileSync || require('fs').readFileSync,
             md5: options.md5 || require('md5'),
             sharp: options.sharp || require('sharp'),
-            validate: options.validate || (() => {
-                const Ajv = require('ajv');
-                const ajv = new Ajv({ allErrors: true });
-                return ajv.compile(ImageGenerator.specSchema);
-            })()
+            validate: options.validate || ImageGenerator.validate
         };
         return new ImageGenerator(spec, resolved);
     }
@@ -56,11 +51,12 @@ class ImageGenerator {
     }
 }
 
-ImageGenerator.specItemPattern = '^(\\d)x(\\d)\\-(\\d+)w\\.(jpg|webp)$';
+ImageGenerator.specItemPattern = /^(\d)x(\d)-(\d+)w\.(jpg|webp)$/;
 
-ImageGenerator.specSchema = {
-    type: 'array',
-    items: { type: 'string', pattern: ImageGenerator.specItemPattern }
+ImageGenerator.validate = (specs) => {
+    const isValid = Array.isArray(specs) && specs.every(spec =>
+        typeof spec === 'string' && ImageGenerator.specItemPattern.test(spec));
+    return isValid;
 };
 
 module.exports = ImageGenerator.create;

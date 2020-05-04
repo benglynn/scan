@@ -23,11 +23,10 @@
   },
   "homepage": "https://github.com/benglynn/image-generator#readme",
   "devDependencies": {
-    "ajv": "^6.11.0",
     "chai": "^4.2.0",
     "eslint": "^6.8.0",
     "md5": "^2.2.1",
-    "mocha": "^7.0.1",
+    "mocha": "^7.1.2",
     "sharp": "^0.24.1"
   }
 }

@@ -14,18 +14,18 @@ describe('ImageProcessor', function () {
                 })
             })
         });
-        const validate = () => true;
-        const options = { readFileSync, md5, sharp, validate };
+        const options = { readFileSync, md5, sharp };
         return imageGenerator(spec, options);
     };
 
-    describe('#create()', function () {
+    describe('create', function () {
 
         it('should throw for an invalid spec', function () {
-            expect(mockedGenerator).to.throw();
-            expect(() => mockedGenerator('xxx')).to.throw();
-            expect(() => mockedGenerator(['invalid', 'invalid'])).to.throw();
-            expect(() => mockedGenerator(['1x1-160w.svg'])).to.throw();
+            const message = 'unexpected spec format';
+            expect(mockedGenerator).to.throw(message);
+            expect(() => mockedGenerator('xxx')).to.throw(message);
+            expect(() => mockedGenerator(['invalid', 'invalid'])).to.throw(message);
+            expect(() => mockedGenerator(['1x1-160w.svg'])).to.throw(message);
         });
 
         it('should create', function () {
@@ -34,7 +34,7 @@ describe('ImageProcessor', function () {
         });
     });
 
-    describe('#parseSpec', function () {
+    describe('parseSpec', function () {
 
         it('parses each passed spec', function () {
             const processor = mockedGenerator(specFixture);
@@ -52,12 +52,13 @@ describe('ImageProcessor', function () {
 
     });
 
-    describe('#process()', function () {
+    describe('process', function () {
 
         it('should throw for an unsuported file type', function () {
             const instance = mockedGenerator(specFixture);
-            expect(() => instance.process('not a file')).to.throw();
-            expect(() => instance.process('/path/to/unsuported.svg')).to.throw();
+            const message = /^unexpected file path/;
+            expect(() => instance.process('not a file')).to.throw(message);
+            expect(() => instance.process('/path/to/unsuported.svg')).to.throw(message);
             expect(() => instance.process('no-path.jpg')).not.to.throw();
         });
 
