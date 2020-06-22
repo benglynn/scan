@@ -1,27 +1,27 @@
 {
-  "name": "@benglynn/image-generator",
-  "version": "1.0.0",
-  "description": "Generate many versions of an image.",
-  "main": "src/image-generator.js",
+  "name": "@benglynn/scan",
+  "version": "0.0.1",
+  "description": "Generate image variations.",
+  "main": "src",
   "scripts": {
     "pretest": "eslint --ignore-path .gitignore .",
     "test": "mocha",
-    "demo": "node test/demo.js"
+    "demo": "node scripts/demo.js"
   },
   "mocha": {
     "spec": "./test/**/*.spec.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/benglynn/image-generator.git"
+    "url": "git+https://github.com/benglynn/scan.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/benglynn/image-generator/issues"
+    "url": "https://github.com/benglynn/scan/issues"
   },
-  "homepage": "https://github.com/benglynn/image-generator#readme",
+  "homepage": "https://github.com/benglynn/scan#readme",
   "devDependencies": {
     "chai": "^4.2.0",
     "eslint": "^6.8.0",
