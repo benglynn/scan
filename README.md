@@ -1,9 +1,9 @@
-![Node.js CI](https://github.com/benglynn/image-generator/workflows/Node.js%20CI/badge.svg)
+![Node.js CI](https://github.com/benglynn/scan/workflows/Node.js%20CI/badge.svg)
 
-# Image generator
+# Scan
 
-Generate many versions of an image. Useful in static site generation for
-responsive design and SEO.
+Generate variations of an image. Useful in static site generation in preparing
+assets for for responsive design and for discoverability.
 
 Given a jpeg or png master and an array of **image spec** strings, returns a
 array of promises that each resolve to an **asset object**.
@@ -19,7 +19,7 @@ The **asset object** is an object (like a webpack asset) on which:
 - `source()` returns the new image bytes.
 - `size()` returns the byte length of the new image.
 
-See [demo.js](./test/demo.js) for example usage.
+See [demo.js](./scripts/demo.js) for example usage.
 
 ```bash
 # once
