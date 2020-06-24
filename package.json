@@ -4,8 +4,9 @@
   "description": "Generate image variations.",
   "main": "src",
   "scripts": {
-    "pretest": "eslint --ignore-path .gitignore .",
+    "pretest": "npm run lint",
     "test": "mocha",
+    "lint": "eslint  --ignore-path .gitignore .",
     "demo": "node scripts/demo.js"
   },
   "mocha": {
@@ -25,8 +26,11 @@
   "devDependencies": {
     "chai": "^4.2.0",
     "eslint": "^6.8.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-prettier": "^3.1.4",
     "md5": "^2.2.1",
     "mocha": "^7.1.2",
+    "prettier": "^2.0.5",
     "sharp": "^0.24.1"
   }
 }
