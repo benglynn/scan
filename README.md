@@ -10,7 +10,7 @@ array of promises that each resolve to an **asset object**.
 
 Each string in the **image spec** array defines ratio, width and format. For
 example `8x5-800w.webp`. Here's the [image
-spec](./test/fixtures/image-spec.json) used in the demo and tests.
+specs](./test/fixtures/image-specs.json) used in the demo and tests.
 
 The **asset object** is an object (like a webpack asset) on which:
 - `name` is derived from the master image name, a hash of the master image's

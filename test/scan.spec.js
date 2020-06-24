@@ -1,6 +1,22 @@
 const expect = require("chai").expect;
-const { createScan } = require("../src");
-const specFixture = require("./fixtures/image-spec.json");
+const { createScan } = require("..");
+const parseSpecs = require("../src/parse-specs");
+const specFixture = require("./fixtures/image-specs.json");
+
+describe("parseSpecs", function () {
+  it("parses each passed spec", function () {
+    const parsed = parseSpecs(specFixture);
+    expect(parsed).to.have.lengthOf(12);
+  });
+
+  it("parses each attribute correctly", function () {
+    const parsed = parseSpecs(["8x5-1360w.webp"])[0];
+    expect(parsed.name).to.equal("8x5-1360w.webp");
+    expect(parsed.width).to.equal(1360);
+    expect(parsed.height).to.equal((1360 * 5) / 8);
+    expect(parsed.type).to.equal("webp");
+  });
+});
 
 describe("Scan", function () {
   const createStubScan = (specs) => {
@@ -29,22 +45,6 @@ describe("Scan", function () {
     it("should create", function () {
       expect(() => createStubScan(["1x1-160w.jpg"])).not.to.throw();
       expect(() => createStubScan(specFixture)).not.to.throw();
-    });
-  });
-
-  describe("parseSpec", function () {
-    it("parses each passed spec", function () {
-      const processor = createStubScan(specFixture);
-      expect(processor.specs).to.have.lengthOf(12);
-    });
-
-    it("parses each attribute correctly", function () {
-      const processor = createStubScan(["8x5-1360w.webp"]);
-      const parsed = processor.specs[0];
-      expect(parsed.name).to.equal("8x5-1360w.webp");
-      expect(parsed.width).to.equal(1360);
-      expect(parsed.height).to.equal((1360 * 5) / 8);
-      expect(parsed.type).to.equal("webp");
     });
   });
 
