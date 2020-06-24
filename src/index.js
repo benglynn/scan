@@ -1,6 +1,5 @@
-'use strict';
+"use strict";
 
-const createScan = require('./scan');
+const createScan = require("./scan");
 
 module.exports = { createScan };
-
