@@ -1,13 +1,24 @@
 "use strict";
 
 class Scan {
-  constructor(spec, options) {
-    this.options = options;
+  constructor(
+    spec,
+    {
+      readFileSync = require("fs").readFileSync,
+      md5 = require("md5"),
+      sharp = require("sharp"),
+      validate = Scan.validate,
+    } = {}
+  ) {
+    this.readFileSync = readFileSync;
+    this.md5 = md5;
+    this.sharp = sharp;
+    this.validate = validate;
     this.parseSpec(spec);
   }
 
   parseSpec(spec) {
-    if (!this.options.validate(spec)) {
+    if (!this.validate(spec)) {
       throw new Error("unexpected spec format");
     }
     this.spec = spec.map((key) => {
@@ -21,13 +32,7 @@ class Scan {
   }
 
   static create(spec, options = {}) {
-    const resolved = {
-      readFileSync: options.readFileSync || require("fs").readFileSync,
-      md5: options.md5 || require("md5"),
-      sharp: options.sharp || require("sharp"),
-      validate: options.validate || Scan.validate,
-    };
-    return new Scan(spec, resolved);
+    return new Scan(spec, options);
   }
 
   process(filePth) {
@@ -37,12 +42,11 @@ class Scan {
       throw new Error(`unexpected file path: ${filePth}`);
     }
     const originalName = filePth.match(inFilePattern)[1];
-    const bytes = this.options.readFileSync(filePth);
-    const hash = this.options.md5(bytes);
+    const bytes = this.readFileSync(filePth);
+    const hash = this.md5(bytes);
     return this.spec.map((imgSpec) => {
       const name = `${originalName}-${hash}-${imgSpec.name}`;
-      return this.options
-        .sharp(bytes)
+      return this.sharp(bytes)
         .resize(imgSpec.width, imgSpec.height)
         .toFormat(imgSpec.type)
         .toBuffer()
