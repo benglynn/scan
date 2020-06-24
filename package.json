@@ -4,10 +4,10 @@
   "description": "Generate image variations.",
   "main": "src",
   "scripts": {
-    "pretest": "eslint --ignore-path .gitignore .",
+    "pretest": "npm run lint",
     "test": "mocha",
-    "demo": "node scripts/demo.js",
-    "lint": "eslint src/**/*.js test/**/*.js"
+    "lint": "eslint  --ignore-path .gitignore .",
+    "demo": "node scripts/demo.js"
   },
   "mocha": {
     "spec": "./test/**/*.spec.js"
