@@ -2,13 +2,43 @@
 
 const specItemPattern = /^(\d)x(\d)-(\d+)w\.(jpg|webp)$/;
 
-const validateSpecs = (specs) => {
-  const isValid =
-    Array.isArray(specs) &&
-    specs.every(
-      (spec) => typeof spec === "string" && specItemPattern.test(spec)
+const parseSpecs = (specs) => {
+  if (
+    !Array.isArray(specs) ||
+    specs.some((spec) => !specItemPattern.test(spec))
+  ) {
+    throw new Error("unexpected spec format");
+  }
+  return specs.map((key) => {
+    const [name, ratioWidth, ratioHeight, width, type] = key.match(
+      specItemPattern
     );
-  return isValid;
+    const ratio = parseInt(ratioWidth) / parseInt(ratioHeight);
+    const height = Math.round(parseInt(width) / ratio);
+    return { name, width: parseInt(width), height, type };
+  });
+};
+
+const processFilePartial = (spec, readFileSync, md5, sharp) => (filePth) => {
+  const inFilePattern = /^.*?([^/\\]+)\.(jpg|png)$/;
+  const valid = inFilePattern.test(filePth) === true;
+  if (!valid) {
+    throw new Error(`unexpected file path: ${filePth}`);
+  }
+  const originalName = filePth.match(inFilePattern)[1];
+  const bytes = readFileSync(filePth);
+  const hash = md5(bytes);
+  return spec.map((imgSpec) => {
+    const name = `${originalName}-${hash}-${imgSpec.name}`;
+    return sharp(bytes)
+      .resize(imgSpec.width, imgSpec.height)
+      .toFormat(imgSpec.type)
+      .toBuffer()
+      .then((bytes) => {
+        const size = bytes.byteLength;
+        return { name, source: () => bytes, size: () => size };
+      });
+  });
 };
 
 module.exports = (spec, options = {}) => {
@@ -17,54 +47,14 @@ module.exports = (spec, options = {}) => {
 
 class Scan {
   constructor(
-    spec,
+    specs,
     {
       readFileSync = require("fs").readFileSync,
       md5 = require("md5"),
       sharp = require("sharp"),
-      validate = validateSpecs,
     } = {}
   ) {
-    this.readFileSync = readFileSync;
-    this.md5 = md5;
-    this.sharp = sharp;
-    this.validate = validate;
-    this.parseSpec(spec);
-  }
-
-  parseSpec(spec) {
-    if (!this.validate(spec)) {
-      throw new Error("unexpected spec format");
-    }
-    this.spec = spec.map((key) => {
-      const [name, ratioWidth, ratioHeight, width, type] = key.match(
-        specItemPattern
-      );
-      const ratio = parseInt(ratioWidth) / parseInt(ratioHeight);
-      const height = Math.round(parseInt(width) / ratio);
-      return { name, width: parseInt(width), height, type };
-    });
-  }
-
-  process(filePth) {
-    const inFilePattern = /^.*?([^/\\]+)\.(jpg|png)$/;
-    const valid = inFilePattern.test(filePth) === true;
-    if (!valid) {
-      throw new Error(`unexpected file path: ${filePth}`);
-    }
-    const originalName = filePth.match(inFilePattern)[1];
-    const bytes = this.readFileSync(filePth);
-    const hash = this.md5(bytes);
-    return this.spec.map((imgSpec) => {
-      const name = `${originalName}-${hash}-${imgSpec.name}`;
-      return this.sharp(bytes)
-        .resize(imgSpec.width, imgSpec.height)
-        .toFormat(imgSpec.type)
-        .toBuffer()
-        .then((bytes) => {
-          const size = bytes.byteLength;
-          return { name, source: () => bytes, size: () => size };
-        });
-    });
+    this.spec = parseSpecs(specs);
+    this.process = processFilePartial(this.spec, readFileSync, md5, sharp);
   }
 }
