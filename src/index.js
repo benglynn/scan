@@ -1,3 +1,3 @@
 "use strict";
 
-module.exports = { createScan: require("./scan") };
+module.exports = { createScan: require("./create-scan") };
