@@ -3,7 +3,7 @@ const { createScan } = require("../src");
 const specFixture = require("./fixtures/image-spec.json");
 
 describe("Scan", function () {
-  const createStubScan = (spec) => {
+  const createStubScan = (specs) => {
     const readFileSync = () => 12345;
     const md5 = () => "mockhash";
     const sharp = () => ({
@@ -14,7 +14,7 @@ describe("Scan", function () {
       }),
     });
     const options = { readFileSync, md5, sharp };
-    return createScan(spec, options);
+    return createScan(specs, options);
   };
 
   describe("create", function () {
@@ -35,12 +35,12 @@ describe("Scan", function () {
   describe("parseSpec", function () {
     it("parses each passed spec", function () {
       const processor = createStubScan(specFixture);
-      expect(processor.spec).to.have.lengthOf(12);
+      expect(processor.specs).to.have.lengthOf(12);
     });
 
     it("parses each attribute correctly", function () {
       const processor = createStubScan(["8x5-1360w.webp"]);
-      const parsed = processor.spec[0];
+      const parsed = processor.specs[0];
       expect(parsed.name).to.equal("8x5-1360w.webp");
       expect(parsed.width).to.equal(1360);
       expect(parsed.height).to.equal((1360 * 5) / 8);
@@ -66,7 +66,7 @@ describe("Scan", function () {
       expect(result[0]).to.be.a("promise");
     });
 
-    it("should return a promise that resolves to spec", async function () {
+    it("should return a promise that resolves to correct name", async function () {
       const instance = createStubScan(["8x5-1360w.webp"]);
       const result = await instance.process("file-name.jpg")[0];
       expect(result.source).to.be.a("function");

@@ -1,17 +1,14 @@
 "use strict";
 
-const specItemPattern = /^(\d)x(\d)-(\d+)w\.(jpg|webp)$/;
+const specPattern = /^(\d)x(\d)-(\d+)w\.(jpg|webp)$/;
 
 const parseSpecs = (specs) => {
-  if (
-    !Array.isArray(specs) ||
-    specs.some((spec) => !specItemPattern.test(spec))
-  ) {
+  if (!Array.isArray(specs) || specs.some((spec) => !specPattern.test(spec))) {
     throw new Error("unexpected spec format");
   }
-  return specs.map((key) => {
-    const [name, ratioWidth, ratioHeight, width, type] = key.match(
-      specItemPattern
+  return specs.map((spec) => {
+    const [name, ratioWidth, ratioHeight, width, type] = spec.match(
+      specPattern
     );
     const ratio = parseInt(ratioWidth) / parseInt(ratioHeight);
     const height = Math.round(parseInt(width) / ratio);
@@ -19,20 +16,19 @@ const parseSpecs = (specs) => {
   });
 };
 
-const processFilePartial = (spec, readFileSync, md5, sharp) => (filePth) => {
+const processFilePartial = (specs, readFileSync, md5, sharp) => (filePth) => {
   const inFilePattern = /^.*?([^/\\]+)\.(jpg|png)$/;
-  const valid = inFilePattern.test(filePth) === true;
-  if (!valid) {
+  if (!inFilePattern.test(filePth)) {
     throw new Error(`unexpected file path: ${filePth}`);
   }
   const originalName = filePth.match(inFilePattern)[1];
   const bytes = readFileSync(filePth);
   const hash = md5(bytes);
-  return spec.map((imgSpec) => {
-    const name = `${originalName}-${hash}-${imgSpec.name}`;
+  return specs.map((spec) => {
+    const name = `${originalName}-${hash}-${spec.name}`;
     return sharp(bytes)
-      .resize(imgSpec.width, imgSpec.height)
-      .toFormat(imgSpec.type)
+      .resize(spec.width, spec.height)
+      .toFormat(spec.type)
       .toBuffer()
       .then((bytes) => {
         const size = bytes.byteLength;
@@ -49,7 +45,7 @@ module.exports = (
     sharp = require("sharp"),
   } = {}
 ) => {
-  const spec = parseSpecs(specs);
-  const process = processFilePartial(spec, readFileSync, md5, sharp);
-  return { spec, process };
+  const parsedSpecs = parseSpecs(specs);
+  const process = processFilePartial(parsedSpecs, readFileSync, md5, sharp);
+  return { specs: parsedSpecs, process };
 };
