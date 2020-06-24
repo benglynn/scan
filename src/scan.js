@@ -11,6 +11,10 @@ const validateSpecs = (specs) => {
   return isValid;
 };
 
+module.exports = (spec, options = {}) => {
+  return new Scan(spec, options);
+};
+
 class Scan {
   constructor(
     spec,
@@ -42,10 +46,6 @@ class Scan {
     });
   }
 
-  static create(spec, options = {}) {
-    return new Scan(spec, options);
-  }
-
   process(filePth) {
     const inFilePattern = /^.*?([^/\\]+)\.(jpg|png)$/;
     const valid = inFilePattern.test(filePth) === true;
@@ -68,5 +68,3 @@ class Scan {
     });
   }
 }
-
-module.exports = Scan.create;
