@@ -6,7 +6,8 @@
   "scripts": {
     "pretest": "eslint --ignore-path .gitignore .",
     "test": "mocha",
-    "demo": "node scripts/demo.js"
+    "demo": "node scripts/demo.js",
+    "lint": "eslint src/**/*.js test/**/*.js"
   },
   "mocha": {
     "spec": "./test/**/*.spec.js"
@@ -25,8 +26,11 @@
   "devDependencies": {
     "chai": "^4.2.0",
     "eslint": "^6.8.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-prettier": "^3.1.4",
     "md5": "^2.2.1",
     "mocha": "^7.1.2",
+    "prettier": "^2.0.5",
     "sharp": "^0.24.1"
   }
 }
