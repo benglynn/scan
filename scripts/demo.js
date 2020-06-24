@@ -1,7 +1,7 @@
 const path = require("path");
 const fs = require("fs");
 const { createScan } = require("../src");
-const spec = require("../test/fixtures/image-spec");
+const spec = require("../test/fixtures/image-specs");
 const filePth = path.join(
   __dirname,
   "../test/fixtures/christopher-burns-Kj2SaNHG-hg-unsplash.jpg"

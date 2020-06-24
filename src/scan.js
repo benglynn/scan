@@ -1,68 +1,17 @@
 "use strict";
 
-class Scan {
-  constructor(spec, options) {
-    this.options = options;
-    this.parseSpec(spec);
-  }
+const parseSpecs = require("./parse-specs");
+const processFilePartial = require("./process-file-partial");
 
-  parseSpec(spec) {
-    if (!this.options.validate(spec)) {
-      throw new Error("unexpected spec format");
-    }
-    this.spec = spec.map((key) => {
-      const [name, ratioWidth, ratioHeight, width, type] = key.match(
-        Scan.specItemPattern
-      );
-      const ratio = parseInt(ratioWidth) / parseInt(ratioHeight);
-      const height = Math.round(parseInt(width) / ratio);
-      return { name, width: parseInt(width), height, type };
-    });
-  }
-
-  static create(spec, options = {}) {
-    const resolved = {
-      readFileSync: options.readFileSync || require("fs").readFileSync,
-      md5: options.md5 || require("md5"),
-      sharp: options.sharp || require("sharp"),
-      validate: options.validate || Scan.validate,
-    };
-    return new Scan(spec, resolved);
-  }
-
-  process(filePth) {
-    const inFilePattern = /^.*?([^/\\]+)\.(jpg|png)$/;
-    const valid = inFilePattern.test(filePth) === true;
-    if (!valid) {
-      throw new Error(`unexpected file path: ${filePth}`);
-    }
-    const originalName = filePth.match(inFilePattern)[1];
-    const bytes = this.options.readFileSync(filePth);
-    const hash = this.options.md5(bytes);
-    return this.spec.map((imgSpec) => {
-      const name = `${originalName}-${hash}-${imgSpec.name}`;
-      return this.options
-        .sharp(bytes)
-        .resize(imgSpec.width, imgSpec.height)
-        .toFormat(imgSpec.type)
-        .toBuffer()
-        .then((bytes) => {
-          const size = bytes.byteLength;
-          return { name, source: () => bytes, size: () => size };
-        });
-    });
-  }
-}
-
-Scan.specItemPattern = /^(\d)x(\d)-(\d+)w\.(jpg|webp)$/;
-
-Scan.validate = (specs) => {
-  const isValid =
-    Array.isArray(specs) &&
-    specs.every(
-      (spec) => typeof spec === "string" && Scan.specItemPattern.test(spec)
-    );
-  return isValid;
+module.exports = (
+  specs,
+  {
+    readFileSync = require("fs").readFileSync,
+    md5 = require("md5"),
+    sharp = require("sharp"),
+  } = {}
+) => {
+  const parsedSpecs = parseSpecs(specs);
+  const process = processFilePartial(parsedSpecs, readFileSync, md5, sharp);
+  return { specs: parsedSpecs, process };
 };
-
-module.exports = Scan.create;
