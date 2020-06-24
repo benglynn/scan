@@ -1,6 +1,6 @@
 "use strict";
 
-const specPattern = require("./spec-pattern");
+const specPattern = /^(\d)x(\d)-(\d+)w\.(jpg|webp)$/;
 
 module.exports = (specs) => {
   if (!Array.isArray(specs) || specs.some((spec) => !specPattern.test(spec))) {
