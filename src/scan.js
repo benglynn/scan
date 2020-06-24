@@ -1,5 +1,16 @@
 "use strict";
 
+const specItemPattern = /^(\d)x(\d)-(\d+)w\.(jpg|webp)$/;
+
+const validateSpecs = (specs) => {
+  const isValid =
+    Array.isArray(specs) &&
+    specs.every(
+      (spec) => typeof spec === "string" && specItemPattern.test(spec)
+    );
+  return isValid;
+};
+
 class Scan {
   constructor(
     spec,
@@ -7,7 +18,7 @@ class Scan {
       readFileSync = require("fs").readFileSync,
       md5 = require("md5"),
       sharp = require("sharp"),
-      validate = Scan.validate,
+      validate = validateSpecs,
     } = {}
   ) {
     this.readFileSync = readFileSync;
@@ -23,7 +34,7 @@ class Scan {
     }
     this.spec = spec.map((key) => {
       const [name, ratioWidth, ratioHeight, width, type] = key.match(
-        Scan.specItemPattern
+        specItemPattern
       );
       const ratio = parseInt(ratioWidth) / parseInt(ratioHeight);
       const height = Math.round(parseInt(width) / ratio);
@@ -57,16 +68,5 @@ class Scan {
     });
   }
 }
-
-Scan.specItemPattern = /^(\d)x(\d)-(\d+)w\.(jpg|webp)$/;
-
-Scan.validate = (specs) => {
-  const isValid =
-    Array.isArray(specs) &&
-    specs.every(
-      (spec) => typeof spec === "string" && Scan.specItemPattern.test(spec)
-    );
-  return isValid;
-};
 
 module.exports = Scan.create;
