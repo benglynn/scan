@@ -41,20 +41,15 @@ const processFilePartial = (spec, readFileSync, md5, sharp) => (filePth) => {
   });
 };
 
-module.exports = (spec, options = {}) => {
-  return new Scan(spec, options);
+module.exports = (
+  specs,
+  {
+    readFileSync = require("fs").readFileSync,
+    md5 = require("md5"),
+    sharp = require("sharp"),
+  } = {}
+) => {
+  const spec = parseSpecs(specs);
+  const process = processFilePartial(spec, readFileSync, md5, sharp);
+  return { spec, process };
 };
-
-class Scan {
-  constructor(
-    specs,
-    {
-      readFileSync = require("fs").readFileSync,
-      md5 = require("md5"),
-      sharp = require("sharp"),
-    } = {}
-  ) {
-    this.spec = parseSpecs(specs);
-    this.process = processFilePartial(this.spec, readFileSync, md5, sharp);
-  }
-}
